@@ -15,12 +15,17 @@ ENV SNIPROXY_DNS_V4_REDIRECT=8.8.8.8
 ENV SNIPROXY_DNS_UPSTREAM=8.8.8.8
 ENV SNIPROXY_EXTRA_ARGS=
 
+ADD healthcheck.sh /healthcheck.sh
+
 RUN apt update \
     && apt install -y curl \
-    && apt clean
+    && apt clean \
+    && chmod +x /healthcheck.sh
 
 WORKDIR /app
 
 COPY --from=build /app/sniproxy .
 
 CMD [ "/bin/sh", "-c", "sniproxy --dns-redirect-ipv4-to=${SNIPROXY_DNS_V4_REDIRECT} --dns-upstream=${SNIPROXY_DNS_UPSTREAM} ${SNIPROXY_EXTRA_ARGS}" ]
+
+HEALTHCHECK --interval=1m --timeout=3s --start-period=5s --retries=1 CMD [ "/healthcheck.sh" ]
