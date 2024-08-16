@@ -15,6 +15,10 @@ ENV SNIPROXY_DNS_V4_REDIRECT=8.8.8.8
 ENV SNIPROXY_DNS_UPSTREAM=8.8.8.8
 ENV SNIPROXY_EXTRA_ARGS=
 
+RUN apt update \
+    && apt install -y curl \
+    && apt clean
+
 WORKDIR /app
 
 COPY --from=build /app/sniproxy .
